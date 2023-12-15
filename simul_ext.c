@@ -20,10 +20,10 @@ void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
 void GrabarDatos(EXT_DATOS *memdatos, FILE *fich);
 
 int main(){
-	 char *comando[LONGITUD_COMANDO];
-	 char *orden[LONGITUD_COMANDO];
-	 char *argumento1[LONGITUD_COMANDO];
-	 char *argumento2[LONGITUD_COMANDO];
+	 char comando[LONGITUD_COMANDO];
+	 char orden[LONGITUD_COMANDO];
+	 char argumento1[LONGITUD_COMANDO];
+	 char argumento2[LONGITUD_COMANDO];
 	 
 	 int i,j;
 	 unsigned long int m;
@@ -45,14 +45,14 @@ int main(){
 
      fread(&datosfich, SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fent);    
      
-     /*
+     
      memcpy(&ext_superblock,(EXT_SIMPLE_SUPERBLOCK *)&datosfich[0], SIZE_BLOQUE);
      memcpy(&directorio,(EXT_ENTRADA_DIR *)&datosfich[3], SIZE_BLOQUE);
      memcpy(&ext_bytemaps,(EXT_BLQ_INODOS *)&datosfich[1], SIZE_BLOQUE);
      memcpy(&ext_blq_inodos,(EXT_BLQ_INODOS *)&datosfich[2], SIZE_BLOQUE);
      memcpy(&memdatos,(EXT_DATOS *)&datosfich[4],MAX_BLOQUES_DATOS*SIZE_BLOQUE);
      
-    */
+    
 
      // Bucle de tratamiento de comandos
      for (;;){
@@ -60,8 +60,8 @@ int main(){
 		 printf (">> ");
 		 fflush(stdin);
 		 fgets(comando, LONGITUD_COMANDO, stdin);
-		 } while (/*ComprobarComando(comando,orden,argumento1,argumento2 != 0*/ 1 == 1);
-	     if (strcmp(orden,"dir")==0) {
+		 } while (ComprobarComando(comando,orden,argumento1,argumento2) != 0);
+	     if (strcmp(orden,"dir\n")==0) {
             //Directorio(&directorio,&ext_blq_inodos);
             
 
@@ -78,7 +78,7 @@ int main(){
          //Si el comando es salir se habrán escrito todos los metadatos
          //faltan los datos y cerrar
          */
-         if (strcmp(orden,"salir")==0){
+         if (strcmp(orden,"salir\n")==0){
             //GrabarDatos(&memdatos,fent);
             fclose(fent);
             return 0;
@@ -88,11 +88,21 @@ int main(){
 
 
 int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2) {
+ 
+    char *a = strtok(strcomando, " ");
+    strcpy(orden, a);
 
-  orden = strtok(strcomando, ' ');
-  argumento1 = strtok(strcomando, ' ');
-  argumento2 = strtok(strcomando, ' ');
+    char *b = strtok(NULL, " ");
 
-  return 1;
-  }
+    if(b != NULL) {
+      strcpy(argumento1, b);
+    }
+    char *c = strtok(NULL, " ");
+        
+    if(c != NULL) {
+      strcpy(argumento2, c);
+    }
+
+    return 0;
+}
 
