@@ -62,11 +62,17 @@ int main(){
 		 fgets(comando, LONGITUD_COMANDO, stdin);
 		 } while (ComprobarComando(comando,orden,argumento1,argumento2) != 0);
 	     if (strcmp(orden,"dir\n")==0) {
-            //Directorio(&directorio,&ext_blq_inodos);
+            Directorio(&directorio,&ext_blq_inodos);
             
 
             continue;
             }
+            
+        if(strcmp(orden, "info\n") == 0) {
+          LeeSuperBloque(&ext_superblock);
+          
+          continue;
+        } 
          /*//...
          // Escritura de metadatos en comandos rename, remove, copy     
          Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
@@ -115,3 +121,29 @@ void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup) {
     printf("Primer bloque de datos = %d\n", psup->s_first_data_block);
 
 }
+
+void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos) {
+
+    int inodo_fichero;
+    int n_bloque;
+
+    for(int i = 1; i < MAX_FICHEROS; i++) {
+
+      inodo_fichero = directorio[i].dir_inodo;
+      if(inodo_fichero != NULL_INODO){
+        printf("Nombre: %s\tTamano: %d\tInodo: %d\tBloque: ", directorio[i].dir_nfich, inodos->blq_inodos[inodo_fichero].size_fichero, inodo_fichero);
+
+        for(int j = 0; j < MAX_NUMS_BLOQUE_INODO; j++) {
+          
+          n_bloque = inodos->blq_inodos[inodo_fichero].i_nbloque[j];
+          
+          if(n_bloque != NULL_BLOQUE){
+          printf("%d ", inodos->blq_inodos[inodo_fichero].i_nbloque[j]);
+        }
+      }
+        printf("\n");
+
+      }
+      
+    }
+  }
