@@ -86,7 +86,6 @@ int main(){
      }
 }
 
-
 int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2) {
  
     char *a = strtok(strcomando, " ");
@@ -106,3 +105,13 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
     return 0;
 }
 
+void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup) {
+
+    printf("Bloque %d bytes\n", psup->s_block_size);
+    printf("Inodos particion = %d\n", psup->s_inodes_count);
+    printf("Inodos libres = %d\n", psup->s_free_inodes_count);
+    printf("Bloques particion = %d\n", psup->s_blocks_count);
+    printf("Bloques libres = %d\n", psup->s_free_blocks_count);
+    printf("Primer bloque de datos = %d\n", psup->s_first_data_block);
+
+}
