@@ -71,6 +71,10 @@ int main(){
           continue;
         }
 
+        if(strcmp(orden, "bytemaps\n") == 0) {
+          Printbytemaps(&ext_bytemaps);
+        } 
+
         if(strcmp(orden, "rename") == 0) {
           Renombrar(directorio, &ext_blq_inodos, argumento1, argumento2);
           continue;
@@ -124,6 +128,24 @@ void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup) {
     printf("Primer bloque de datos = %d\n", psup->s_first_data_block);
 
 }
+
+void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps) {
+   
+    printf("Inodos: ");
+ 
+    for(int i = 0; i < MAX_INODOS; i++) {
+      printf("%d ", ext_bytemaps->bmap_inodos[i]);
+    }
+ 
+    printf("\nBloques [0-25]: ");
+   
+    for(int i = 0; i < 25; i++) {
+      printf("%d ", ext_bytemaps->bmap_bloques[i]);
+    }
+ 
+    printf("\n");
+ 
+  }
 
 void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos) {
 
