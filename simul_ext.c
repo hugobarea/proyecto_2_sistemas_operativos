@@ -118,6 +118,16 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
     return 0;
 }
 
+int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombre) {
+  for(int i = 1; i < MAX_FICHEROS; i++) {
+    if(strcmp(directorio[i].dir_nfich, nombre) == 0 && directorio[i].dir_inodo != NULL_INODO) {
+      return directorio[i].dir_inodo;
+    }
+  }
+
+  return -1;
+}
+
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup) {
 
     printf("Bloque %d bytes\n", psup->s_block_size);
@@ -178,23 +188,26 @@ int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombrea
   nombrenuevo[strcspn(nombrenuevo, "\n")] = 0;
   nombreantiguo[strcspn(nombreantiguo, "\n")] = 0;
   
+  int inodo_fichero = BuscaFich(directorio, inodos, nombrenuevo);
 
-  for(int i = 0; i < MAX_FICHEROS; i++) {    
-
-    if(strcmp(nombrenuevo, directorio[i].dir_nfich) == 0 && directorio[i].dir_inodo != NULL_INODO) {
-      printf("ERROR: El nombre de fichero ya existe\n");
-      return 1;
-    }
+  if(inodo_fichero != -1) {
+    printf("ERROR: El nombre de fichero ya existe\n");
+    return 1;
   }
+
+  inodo_fichero = BuscaFich(directorio, inodos, nombreantiguo);
+
+  if(inodo_fichero == -1) {
+    printf("ERROR: El fichero de origen no se ha encontrado\n");
+    return 1;
+  }
+
+  // Encontramos el fichero a través del inodo
 
   for(int i = 0; i < MAX_FICHEROS; i++) {
-
-    if(strcmp(nombreantiguo, directorio[i].dir_nfich) == 0 && directorio[i].dir_inodo != NULL_INODO) {
+    if(directorio[i].dir_inodo == inodo_fichero) {
       strcpy(directorio[i].dir_nfich, nombrenuevo);
-      return 0;
     }
   }
 
-  printf("ERROR: El fichero de origen no se ha encontrado\n");
-  return 1;
 }
