@@ -84,6 +84,10 @@ int main(){
           Imprimir(directorio, &ext_blq_inodos, memdatos, argumento1);
         }
 
+        if(strcmp(orden, "remove") == 0) {
+          Borrar(directorio, &ext_blq_inodos, &ext_bytemaps, &ext_superblock, argumento1, fent);
+        }
+
         if(strcmp(orden, "copy") == 0) {
           Copiar(directorio, &ext_blq_inodos, &ext_bytemaps, &ext_superblock, memdatos, argumento1, argumento2, fent);
         }
@@ -260,6 +264,8 @@ int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *mem
 
 int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, char *nombre,  FILE *fich) {
 
+  nombre[strcspn(nombre, "\n")] = 0;
+
   int inodo = BuscaFich(directorio, inodos, nombre);
   int bloque;
 
@@ -268,14 +274,37 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
     return 1;
   }
 
-  // Liberamos los bloques y los marcamos como libres en el bytemap de bloques
+  // Marcamos los bloques como libres en el bytemap de bloques y el inodo en el bytemap de inodos
 
-  for(int i = PRIM_BLOQUE_DATOS; i < MAX_NUMS_BLOQUE_INODO; i++) {
+
+  ext_bytemaps->bmap_inodos[inodo] = 0;
+  ext_superblock->s_free_inodes_count++;
+
+  for(int i = 0; i < MAX_NUMS_BLOQUE_INODO; i++) {
 
     bloque = inodos->blq_inodos[inodo].i_nbloque[i];
 
     if(bloque != NULL_BLOQUE) {
+      ext_bytemaps->bmap_bloques[bloque] = 0;
+      ext_superblock->s_free_blocks_count++;
+    }
+  }
 
+  // Liberamos el inodo
+
+  inodos->blq_inodos[inodo].size_fichero = 0;
+
+  for(int i = 0; i < MAX_NUMS_BLOQUE_INODO; i++) {
+    inodos->blq_inodos[inodo].i_nbloque[i] = NULL_BLOQUE;
+  }
+
+  // Liberamos el archivo
+
+  for(int i = 0; i < MAX_FICHEROS; i++) {
+    
+    if(directorio[i].dir_inodo == inodo) {
+      strcpy(directorio[i].dir_nfich, "");
+      directorio[i].dir_inodo = NULL_INODO;
     }
   }
 
