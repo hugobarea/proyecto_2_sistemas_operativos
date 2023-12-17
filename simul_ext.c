@@ -80,6 +80,10 @@ int main(){
           continue;
         }
 
+        if(strcmp(orden, "imprimir") == 0) {
+          Imprimir(directorio, &ext_blq_inodos, memdatos, argumento1);
+        }
+
          /*//...
          // Escritura de metadatos en comandos rename, remove, copy     
          Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
@@ -210,4 +214,41 @@ int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombrea
     }
   }
 
+}
+
+
+int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *memdatos, char *nombre) {
+
+  nombre[strcspn(nombre, "\n")] = 0;
+
+  int inodo_fichero = BuscaFich(directorio, inodos, nombre);
+  int bloque;
+
+  char datos[SIZE_BLOQUE * MAX_NUMS_BLOQUE_INODO];
+
+  if(inodo_fichero == -1) {
+    printf("ERROR: Fichero no encontrado\n");
+    return 1;
+  }
+
+  for(int i = 0; i < MAX_NUMS_BLOQUE_INODO; i++) {
+
+    bloque = inodos->blq_inodos[inodo_fichero].i_nbloque[i];
+
+    // Recorremos cada bloque caracter a caracter o bien hasta que se termine o hasta que encuentre el null byte
+
+    if(bloque != NULL_BLOQUE) {
+      for(int j = 0; j < SIZE_BLOQUE; j++) {
+
+        datos[i * SIZE_BLOQUE + j] = memdatos[bloque - 4].dato[j];
+        if(memdatos[bloque - 4].dato[j] == '\0') {
+          break;
+        }
+      }
+    }
+  }
+
+  printf("%s\n", datos);
+
+  return 0;
 }
