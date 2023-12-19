@@ -77,6 +77,7 @@ int main(){
 
         if(strcmp(orden, "rename") == 0) {
           Renombrar(directorio, &ext_blq_inodos, argumento1, argumento2);
+          Grabarinodosydirectorio(&directorio, &ext_blq_inodos, fent);
           continue;
         }
 
@@ -86,10 +87,17 @@ int main(){
 
         if(strcmp(orden, "remove") == 0) {
           Borrar(directorio, &ext_blq_inodos, &ext_bytemaps, &ext_superblock, argumento1, fent);
+          GrabarSuperBloque(&ext_superblock,fent);
+          GrabarByteMaps(&ext_bytemaps,fent);
+          Grabarinodosydirectorio(directorio,&ext_blq_inodos,fent);
         }
 
         if(strcmp(orden, "copy") == 0) {
           Copiar(directorio, &ext_blq_inodos, &ext_bytemaps, &ext_superblock, memdatos, argumento1, argumento2, fent);
+          GrabarSuperBloque(&ext_superblock,fent);
+          GrabarByteMaps(&ext_bytemaps,fent);
+          Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
+          GrabarDatos(&memdatos,fent);
         }
 
          /*//...
@@ -308,6 +316,10 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
     }
   }
 
+ /* GrabarSuperBloque(ext_superblock, fich);
+  Grabarinodosydirectorio(directorio, inodos, fich);
+  GrabarByteMaps(ext_bytemaps, fich);
+*/
 }
 
 
@@ -418,17 +430,22 @@ for(int i = 0; i < MAX_NUMS_BLOQUE_INODO; i++) {
       break;
     }
   }
-
-
+/*
+  GrabarSuperBloque(ext_superblock, fich);
+  Grabarinodosydirectorio(directorio, inodos, fich);
+  GrabarByteMaps(ext_bytemaps, fich);
+  GrabarDatos(memdatos, fich);
+*/
 }
 
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich) { 
+  fseek(fich, SIZE_BLOQUE * 2, SEEK_SET); 
   fwrite(directorio, SIZE_BLOQUE, 1, fich); 
   fwrite(inodos, SIZE_BLOQUE, 1, fich); 
 } 
 
 void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich) { 
-  fseek(fich, SIZE_BLOQUE * 2, SEEK_SET); 
+  fseek(fich, SIZE_BLOQUE, SEEK_SET); 
   fwrite(ext_bytemaps, SIZE_BLOQUE, 1, fich); 
 } 
 
